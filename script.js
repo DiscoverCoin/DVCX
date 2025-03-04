@@ -1,6 +1,14 @@
 async function fetchCryptoData(url) {
-    const response = await fetch(url);
-    return response.json();
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Error en la API: ${response.status}`);
+        }
+        return response.json();
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return null; // Retornar null en caso de error para manejarlo después
+    }
 }
 
 let coinChart = null;
@@ -9,81 +17,102 @@ let hasDVCX = false; // Simulación de tener DVCX en MetaMask
 // Indicadores Generales del Mercado
 async function loadMarketOverview() {
     const data = await fetchCryptoData('https://api.coingecko.com/api/v3/global');
-    const totalMarketCap = data.data.total_market_cap.usd;
-    const btcDominance = data.data.market_cap_percentage.btc;
-    document.getElementById('total-market-cap').textContent = `$${totalMarketCap.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-    document.getElementById('btc-dominance').textContent = `${btcDominance.toFixed(2)}%`;
+    if (data) {
+        const totalMarketCap = data.data.total_market_cap.usd;
+        const btcDominance = data.data.market_cap_percentage.btc;
+        document.getElementById('total-market-cap').textContent = `$${totalMarketCap.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+        document.getElementById('btc-dominance').textContent = `${btcDominance.toFixed(2)}%`;
+    } else {
+        document.getElementById('total-market-cap').textContent = 'Error al cargar';
+        document.getElementById('btc-dominance').textContent = 'Error al cargar';
+    }
 }
 
 async function loadFearGreedIndex() {
     const data = await fetchCryptoData('https://api.alternative.me/fng/?limit=1');
-    const value = data.data[0].value;
-    const classification = data.data[0].value_classification;
-    document.getElementById('fear-greed').textContent = `${value} - ${classification}`;
+    if (data) {
+        const value = data.data[0].value;
+        const classification = data.data[0].value_classification;
+        document.getElementById('fear-greed').textContent = `${value} - ${classification}`;
+    } else {
+        document.getElementById('fear-greed').textContent = 'Error al cargar';
+    }
 }
 
 // Top 20 Criptomonedas por Capitalización
 async function loadTop20CapCoins() {
     const data = await fetchCryptoData('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1');
-    const list = document.getElementById('top-20-cap-list');
-    list.innerHTML = data.map(coin => `
-        <div class="coin-card">
-            <img src="${coin.image}" alt="${coin.name} icon">
-            <div class="coin-info">
-                <strong>${coin.name} (${coin.symbol.toUpperCase()})</strong>
-                <p>$${coin.current_price.toLocaleString()} 
-                    <span class="${coin.price_change_percentage_24h >= 0 ? 'green' : 'red'}">
-                        (${coin.price_change_percentage_24h.toFixed(2)}%)
-                    </span>
-                </p>
-                <p>Market Cap: $${coin.market_cap.toLocaleString()}</p>
-                <p>Volumen 24h: $${coin.total_volume.toLocaleString()}</p>
+    if (data) {
+        const list = document.getElementById('top-20-cap-list');
+        list.innerHTML = data.map(coin => `
+            <div class="coin-card">
+                <img src="${coin.image}" alt="${coin.name} icon" onerror="this.style.display='none';">
+                <div class="coin-info">
+                    <strong>${coin.name} (${coin.symbol.toUpperCase()})</strong>
+                    <p>$${coin.current_price.toLocaleString()} 
+                        <span class="${coin.price_change_percentage_24h >= 0 ? 'green' : 'red'}">
+                            (${coin.price_change_percentage_24h.toFixed(2)}%)
+                        </span>
+                    </p>
+                    <p>Market Cap: $${coin.market_cap.toLocaleString()}</p>
+                    <p>Volumen 24h: $${coin.total_volume.toLocaleString()}</p>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `).join('');
+    } else {
+        document.getElementById('top-20-cap-list').innerHTML = '<p>Error al cargar las criptomonedas</p>';
+    }
 }
 
 // Top 10 Criptos de Baja Capitalización (entre $1M y $100M)
 async function loadLowCapCoins() {
     const data = await fetchCryptoData('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1');
-    const lowCap = data.filter(coin => coin.market_cap > 1000000 && coin.market_cap < 100000000).slice(0, 10);
-    const list = document.getElementById('low-cap-list');
-    list.innerHTML = lowCap.map(coin => `
-        <div class="coin-card">
-            <img src="${coin.image}" alt="${coin.name} icon">
-            <div class="coin-info">
-                <strong>${coin.name} (${coin.symbol.toUpperCase()})</strong>
-                <p>$${coin.current_price.toLocaleString()} 
-                    <span class="${coin.price_change_percentage_24h >= 0 ? 'green' : 'red'}">
-                        (${coin.price_change_percentage_24h.toFixed(2)}%)
-                    </span>
-                </p>
-                <p>Market Cap: $${coin.market_cap.toLocaleString()}</p>
-                <p>Volumen 24h: $${coin.total_volume.toLocaleString()}</p>
+    if (data) {
+        const lowCap = data.filter(coin => coin.market_cap > 1000000 && coin.market_cap < 100000000).slice(0, 10);
+        const list = document.getElementById('low-cap-list');
+        list.innerHTML = lowCap.map(coin => `
+            <div class="coin-card">
+                <img src="${coin.image}" alt="${coin.name} icon" onerror="this.style.display='none';">
+                <div class="coin-info">
+                    <strong>${coin.name} (${coin.symbol.toUpperCase()})</strong>
+                    <p>$${coin.current_price.toLocaleString()} 
+                        <span class="${coin.price_change_percentage_24h >= 0 ? 'green' : 'red'}">
+                            (${coin.price_change_percentage_24h.toFixed(2)}%)
+                        </span>
+                    </p>
+                    <p>Market Cap: $${coin.market_cap.toLocaleString()}</p>
+                    <p>Volumen 24h: $${coin.total_volume.toLocaleString()}</p>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `).join('');
+    } else {
+        document.getElementById('low-cap-list').innerHTML = '<p>Error al cargar las criptomonedas de baja capitalización</p>';
+    }
 }
 
 // Top 10 Memecoins
 async function loadTopMemecoins() {
     const data = await fetchCryptoData('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=meme-token&order=market_cap_desc&per_page=10&page=1');
-    const list = document.getElementById('memecoin-list');
-    list.innerHTML = data.map(coin => `
-        <div class="coin-card">
-            <img src="${coin.image}" alt="${coin.name} icon">
-            <div class="coin-info">
-                <strong>${coin.name} (${coin.symbol.toUpperCase()})</strong>
-                <p>$${coin.current_price.toLocaleString()} 
-                    <span class="${coin.price_change_percentage_24h >= 0 ? 'green' : 'red'}">
-                        (${coin.price_change_percentage_24h.toFixed(2)}%)
-                    </span>
-                </p>
-                <p>Market Cap: $${coin.market_cap.toLocaleString()}</p>
-                <p>Volumen 24h: $${coin.total_volume.toLocaleString()}</p>
+    if (data) {
+        const list = document.getElementById('memecoin-list');
+        list.innerHTML = data.map(coin => `
+            <div class="coin-card">
+                <img src="${coin.image}" alt="${coin.name} icon" onerror="this.style.display='none';">
+                <div class="coin-info">
+                    <strong>${coin.name} (${coin.symbol.toUpperCase()})</strong>
+                    <p>$${coin.current_price.toLocaleString()} 
+                        <span class="${coin.price_change_percentage_24h >= 0 ? 'green' : 'red'}">
+                            (${coin.price_change_percentage_24h.toFixed(2)}%)
+                        </span>
+                    </p>
+                    <p>Market Cap: $${coin.market_cap.toLocaleString()}</p>
+                    <p>Volumen 24h: $${coin.total_volume.toLocaleString()}</p>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `).join('');
+    } else {
+        document.getElementById('memecoin-list').innerHTML = '<p>Error al cargar los memecoins</p>';
+    }
 }
 
 // Indicadores de Trading para una Criptomoneda Específica
@@ -96,74 +125,80 @@ async function searchCoin() {
         const coinData = await fetchCryptoData(`https://api.coingecko.com/api/v3/coins/${coinInput}?tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`);
         const marketChart = await fetchCryptoData(`https://api.coingecko.com/api/v3/coins/${coinInput}/market_chart?vs_currency=usd&days=14`);
 
-        document.getElementById('coin-name').textContent = coinData.name;
+        if (coinData && marketChart) {
+            document.getElementById('coin-name').textContent = coinData.name;
 
-        const price = coinData.market_data.current_price.usd;
-        const change24h = coinData.market_data.price_change_percentage_24h;
-        const marketCap = coinData.market_data.market_cap.usd;
-        const volume = coinData.market_data.total_volume.usd;
+            const price = coinData.market_data.current_price.usd;
+            const change24h = coinData.market_data.price_change_percentage_24h;
+            const marketCap = coinData.market_data.market_cap.usd;
+            const volume = coinData.market_data.total_volume.usd;
 
-        document.getElementById('coin-price').textContent = `$${price.toLocaleString()}`;
-        document.getElementById('price-change').textContent = `${change24h.toFixed(2)}%`;
-        document.getElementById('market-cap').textContent = `$${marketCap.toLocaleString()}`;
-        document.getElementById('volume').textContent = `$${volume.toLocaleString()}`;
+            document.getElementById('coin-price').textContent = `$${price.toLocaleString()}`;
+            document.getElementById('price-change').textContent = `${change24h.toFixed(2)}%`;
+            document.getElementById('market-cap').textContent = `$${marketCap.toLocaleString()}`;
+            document.getElementById('volume').textContent = `$${volume.toLocaleString()}`;
 
-        const prices = marketChart.prices.map(price => price[1]);
+            const prices = marketChart.prices.map(price => price[1]);
 
-        // RSI (14 días)
-        const rsiPeriod = 14;
-        const gains = [], losses = [];
-        for (let i = 1; i < rsiPeriod + 1; i++) {
-            const diff = prices[prices.length - i] - prices[prices.length - i - 1];
-            if (diff > 0) gains.push(diff); else losses.push(Math.abs(diff));
-        }
-        const avgGain = gains.reduce((a, b) => a + b, 0) / rsiPeriod || 0;
-        const avgLoss = losses.reduce((a, b) => a + b, 0) / rsiPeriod || 1;
-        const rs = avgGain / avgLoss;
-        const rsi = 100 - (100 / (1 + rs));
-        document.getElementById('rsi').textContent = rsi.toFixed(2);
-
-        // MACD (12, 26, 9)
-        const ema12 = calculateEMA(prices, 12);
-        const ema26 = calculateEMA(prices, 26);
-        const macdLine = ema12 - ema26;
-        const signalLine = calculateEMA([macdLine], 9);
-        document.getElementById('macd').textContent = `${macdLine.toFixed(2)} / ${signalLine.toFixed(2)}`;
-
-        // Bollinger Bands (20 días, 2 desviaciones estándar)
-        const period = 20;
-        const sma20 = prices.slice(-period).reduce((a, b) => a + b, 0) / period;
-        const variance = prices.slice(-period).reduce((a, b) => a + Math.pow(b - sma20, 2), 0) / period;
-        const stdDev = Math.sqrt(variance);
-        const upperBand = sma20 + (2 * stdDev);
-        const lowerBand = sma20 - (2 * stdDev);
-        document.getElementById('bollinger').textContent = `Upper: $${upperBand.toFixed(2)}, Lower: $${lowerBand.toFixed(2)}`;
-
-        // Gráfico de precios
-        if (coinChart) coinChart.destroy();
-        const ctx = document.getElementById('price-chart').getContext('2d');
-        coinChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: marketChart.prices.map((_, i) => i),
-                datasets: [{
-                    label: `${coinData.name} Price (USD)`,
-                    data: marketChart.prices.map(price => price[1]),
-                    borderColor: var(--accent-color),
-                    fill: false,
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { display: false },
-                    y: { beginAtZero: false }
-                }
+            // RSI (14 días)
+            const rsiPeriod = 14;
+            const gains = [], losses = [];
+            for (let i = 1; i < rsiPeriod + 1; i++) {
+                const diff = prices[prices.length - i] - prices[prices.length - i - 1];
+                if (diff > 0) gains.push(diff); else losses.push(Math.abs(diff));
             }
-        });
+            const avgGain = gains.reduce((a, b) => a + b, 0) / rsiPeriod || 0;
+            const avgLoss = losses.reduce((a, b) => a + b, 0) / rsiPeriod || 1;
+            const rs = avgGain / avgLoss;
+            const rsi = 100 - (100 / (1 + rs));
+            document.getElementById('rsi').textContent = rsi.toFixed(2);
+
+            // MACD (12, 26, 9)
+            const ema12 = calculateEMA(prices, 12);
+            const ema26 = calculateEMA(prices, 26);
+            const macdLine = ema12 - ema26;
+            const signalLine = calculateEMA([macdLine], 9);
+            document.getElementById('macd').textContent = `${macdLine.toFixed(2)} / ${signalLine.toFixed(2)}`;
+
+            // Bollinger Bands (20 días, 2 desviaciones estándar)
+            const period = 20;
+            const sma20 = prices.slice(-period).reduce((a, b) => a + b, 0) / period;
+            const variance = prices.slice(-period).reduce((a, b) => a + Math.pow(b - sma20, 2), 0) / period;
+            const stdDev = Math.sqrt(variance);
+            const upperBand = sma20 + (2 * stdDev);
+            const lowerBand = sma20 - (2 * stdDev);
+            document.getElementById('bollinger').textContent = `Upper: $${upperBand.toFixed(2)}, Lower: $${lowerBand.toFixed(2)}`;
+
+            // Gráfico de precios
+            if (coinChart) coinChart.destroy();
+            const ctx = document.getElementById('price-chart').getContext('2d');
+            coinChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: marketChart.prices.map((_, i) => i),
+                    datasets: [{
+                        label: `${coinData.name} Price (USD)`,
+                        data: marketChart.prices.map(price => price[1]),
+                        borderColor: var(--accent-color),
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: false },
+                        y: { beginAtZero: false }
+                    }
+                }
+            });
+        } else {
+            alert('Error al cargar los datos de la criptomoneda.');
+            coinDetails.classList.add('hidden');
+        }
     } catch (error) {
+        console.error('Error en searchCoin:', error);
         alert('Moneda no encontrada o error en la API. Intenta de nuevo.');
         coinDetails.classList.add('hidden');
     }
@@ -272,6 +307,7 @@ function syncMetamask() {
 
 // Cargar datos al iniciar
 window.onload = async () => {
+    console.log('Cargando datos...');
     await Promise.all([
         loadMarketOverview(),
         loadFearGreedIndex(),
@@ -279,4 +315,5 @@ window.onload = async () => {
         loadLowCapCoins(),
         loadTopMemecoins()
     ]);
+    console.log('Datos cargados.');
 };
