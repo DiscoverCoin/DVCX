@@ -1,0 +1,152 @@
+/* Estilos existentes... (mantén los anteriores) */
+
+/* Botón del Asistente de IA (minimizado) */
+.ai-assistant-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    color: var(--bg-color);
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.ai-assistant-btn:hover {
+    background-color: #e6c200;
+}
+
+/* Barra Lateral del Asistente de IA */
+.ai-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100%;
+    background-color: var(--bg-color);
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    transition: right 0.3s ease-in-out;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.ai-sidebar.active {
+    right: 0;
+}
+
+.ai-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.ai-sidebar-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--text-color);
+}
+
+.close-btn {
+    font-size: 24px;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: var(--accent-color);
+}
+
+#chat-container {
+    margin-top: 20px;
+}
+
+#chat-messages {
+    height: 400px;
+    overflow-y: auto;
+    background-color: var(--card-bg);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.chat-message {
+    margin: 5px 0;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.ai-message {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+}
+
+.user-message {
+    background-color: var(--secondary-text);
+    color: var(--bg-color);
+    text-align: right;
+}
+
+.chat-input-container {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid var(--accent-color);
+    border-radius: 5px;
+    width: 70%;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.chat-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: 5px;
+    color: var(--bg-color);
+    cursor: pointer;
+}
+
+.chat-button:hover {
+    background-color: #e6c200;
+}
+
+.sync-metamask {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--card-bg);
+    border-radius: 5px;
+    text-align: center;
+}
+
+.sync-metamask p {
+    margin: 0 0 10px 0;
+    color: var(--text-color);
+}
+
+.sync-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: 5px;
+    color: var(--bg-color);
+    cursor: pointer;
+}
+
+.sync-button:hover {
+    background-color: #e6c200;
+}
