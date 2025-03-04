@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DVCX Pro Trading Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>DVCX Pro Trading Dashboard</h1>
+    </header>
+
+    <!-- Sección de Indicadores Generales del Mercado -->
+    <section id="market-overview">
+        <h2>Indicadores Generales del Mercado</h2>
+        <div class="overview-grid">
+            <div class="card">
+                <h3>Total Market Cap</h3>
+                <p id="total-market-cap">Cargando...</p>
+            </div>
+            <div class="card">
+                <h3>Bitcoin Dominance</h3>
+                <p id="btc-dominance">Cargando...</p>
+            </div>
+            <div class="card">
+                <h3>Fear & Greed Index</h3>
+                <p id="fear-greed">Cargando...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Secciones de Criptomonedas Principales -->
+    <section id="top-coins">
+        <h2>Top 20 Criptomonedas por Capitalización</h2>
+        <div id="top-20-cap-list" class="coins-grid"></div>
+    </section>
+
+    <section id="low-cap-coins">
+        <h2>Top 10 Criptos de Baja Capitalización</h2>
+        <div id="low-cap-list" class="coins-grid"></div>
+    </section>
+
+    <section id="memecoins">
+        <h2>Top 10 Memecoins</h2>
+        <div id="memecoin-list" class="coins-grid"></div>
+    </section>
+
+    <!-- Sección de Búsqueda e Indicadores de Trading -->
+    <section id="search-section">
+        <div class="search-container">
+            <input type="text" id="coin-search" placeholder="Buscar moneda (e.g., bitcoin, ethereum)..." class="search-input">
+            <button onclick="searchCoin()" class="search-button">Buscar</button>
+        </div>
+    </section>
+
+    <section id="coin-details" class="hidden">
+        <h2>Detalles de Trading - <span id="coin-name"></span></h2>
+        <div class="details-grid">
+            <div class="card">
+                <h3>Precio Actual</h3>
+                <p id="coin-price">Cargando...</p>
+            </div>
+            <div class="card">
+                <h3>Cambio 24h</h3>
+                <p id="price-change">Cargando...</p>
+            </div>
+            <div class="card">
+                <h3>Market Cap</h3>
+                <p id="market-cap">Cargando...</p>
+            </div>
+            <div class="card">
+                <h3>Volumen 24h</h3>
+                <p id="volume">Cargando...</p>
+            </div>
+            <div class="card">
+                <h3>RSI (14 días)</h3>
+                <p id="rsi">Cargando...</p>
+            </div>
+            <div class="card">
+                <h3>MACD</h3>
+                <p id="macd">Cargando...</p>
+            </div>
+            <div class="card">
+                <h3>Bollinger Bands</h3>
+                <p id="bollinger">Cargando...</p>
+            </div>
+        </div>
+        <canvas id="price-chart" width="400" height="200"></canvas>
+    </section>
+
+    <!-- Botón del Asistente de IA (minimizado) -->
+    <button id="ai-assistant-btn" class="ai-assistant-btn">
+        <i class="fas fa-comment"></i>
+    </button>
+
+    <!-- Barra Lateral del Asistente de IA -->
+    <div id="ai-sidebar" class="ai-sidebar hidden">
+        <div class="ai-sidebar-header">
+            <h2>DVCX AI Assistant</h2>
+            <span class="close-btn" onclick="toggleSidebar()">×</span>
+        </div>
+        <div id="chat-container">
+            <div id="chat-messages"></div>
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Pregunta sobre criptomonedas (e.g., Qué es RSI?)..." class="chat-input">
+                <button onclick="sendMessage()" class="chat-button">Enviar</button>
+            </div>
+        </div>
+        <div id="sync-metamask" class="sync-metamask hidden">
+            <p>Para respuestas avanzadas, sincroniza tu cartera MetaMask y verifica que tienes DVCX.</p>
+            <button onclick="syncMetamask()" class="sync-button">Sincronizar MetaMask</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
